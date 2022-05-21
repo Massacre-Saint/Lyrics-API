@@ -1,25 +1,48 @@
 // USE WITH FIREBASE AUTH
 // import checkLoginStatus from './helpers/auth';
+import axios from 'axios';
 import 'bootstrap'; // import bootstrap elements and js
 import '../styles/main.scss';
 
-const init = () => {
-  document.querySelector('#app').innerHTML = `
-    <h1>HELLO! You are up and running!</h1>
-    <small>Open your dev tools</small><br />
-    <button class="btn btn-danger" id="click-me">Click ME!</button><br />
-    <hr />
-    <h2>These are font awesome icons:</h2>
-    <i class="fas fa-user fa-4x"></i> <i class="fab fa-github-square fa-5x"></i>
-  `;
-  console.warn('YOU ARE UP AND RUNNING!');
-
-  document
-    .querySelector('#click-me')
-    .addEventListener('click', () => console.warn('You clicked that button!'));
-
-  // USE WITH FIREBASE AUTH
-  // checkLoginStatus();
+const renderToDOM = (divId, content) => {
+  const selectedDiv = document.querySelector(divId);
+  selectedDiv.innerHTML = content;
 };
 
-init();
+const htmlStructure = () => {
+  const domstring = '<div id="btn"></div>';
+  renderToDOM('#app', domstring);
+};
+
+// API CALL
+const getLyrics = (artist, song) => new Promise((resolve, reject) => {
+  axios.get(`https://api.lyrics.ovh/v1/${artist}/${song}`)
+    .then((repsonse) => resolve(repsonse.data))
+    .catch((error) => reject(error));
+});
+
+const lyricsOnDom = (artist, song) => {
+  getLyrics(artist, song).then((response) => {
+    document.querySelector('#app').innerHTML = response.lyrics;
+  });
+};
+
+const logLyricsBtn = () => {
+  const domstring = '<button id="log-btn">Log Me!</button>';
+  renderToDOM('#btn', domstring);
+};
+
+const events = () => {
+  const btn = document.querySelector('#log-btn');
+  btn.addEventListener('click', () => {
+    lyricsOnDom('prince', 'purple rain');
+  });
+};
+
+const startApp = () => {
+  // lyricsOnDom('prince', 'purple rain');
+  htmlStructure();
+  logLyricsBtn();
+  events();
+};
+startApp();
